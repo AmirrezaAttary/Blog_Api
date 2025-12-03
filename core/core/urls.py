@@ -40,7 +40,8 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/',include('app.accounts.urls')),
-    # path('', include('webis.urls')),  # add this line to include the todo app urls
+    path('blog/',include('app.blog.urls')),
+    path('comment/',include('app.comment.urls')),
     path('api-auth/', include('rest_framework.urls')),
     # api doc
     path('api/', include_docs_urls(title='API Sample')),
