@@ -23,23 +23,23 @@ jobs:
 
     - name: Build containers
       run: |
-        docker compose -f ../../docker-compose.yml build
+        docker compose -f ../../Docker-compose.yml build
 
     - name: Start DB and Redis
       run: |
-        docker compose -f ../../docker-compose.yml up -d db redis
+        docker compose -f ../../Docker-compose.yml up -d db redis
         echo "⏳ Waiting for Postgres..."
         until docker exec db pg_isready -U postgres; do sleep 1; done
 
     - name: Run migrations
       run: |
-        docker compose -f ../../docker-compose.yml run --rm backend sh -c "python manage.py migrate --noinput"
+        docker compose -f ../../Docker-compose.yml run --rm backend sh -c "python manage.py migrate --noinput"
 
     - name: Run tests
       run: |
-        docker compose -f ../../docker-compose.yml run --rm backend pytest -vv
+        docker compose -f ../../Docker-compose.yml run --rm backend pytest -vv
 
     - name: Stop Docker Compose
       if: always()
       run: |
-        docker compose -f ../../docker-compose.yml down
+        docker compose -f ../../Docker-compose.yml down
