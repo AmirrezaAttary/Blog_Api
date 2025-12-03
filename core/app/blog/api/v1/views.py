@@ -24,7 +24,8 @@ class PostModelViewSet(viewsets.ModelViewSet):
 
 class CategoryModelViewSet(viewsets.ModelViewSet):
     """getting a list of categories and creating new categories"""
-
+    
+    pagination_class = LargeResultsSetPagination 
     permission_classes = [IsAuthenticatedOrReadOnly]
     serializer_class = CategorySerializer
     queryset = Category.objects.all()
