@@ -4,8 +4,6 @@ from django.urls import reverse_lazy
 from django.contrib.auth import login
 from django.shortcuts import redirect
 from .forms import CustomUserCreationForm  # فرم سفارشی را ایمپورت کنید
-from .tasks import sendEmail
-from django.http import HttpResponse
 
 class CustomLoginView(LoginView):
     template_name = "accounts/login.html"
@@ -33,7 +31,3 @@ class RegisterPage(FormView):
             return redirect("todo:task-list")
         return super(RegisterPage, self).get(*args, **kwargs)
 
-
-def send_email(request):
-    sendEmail.delay()
-    return HttpResponse("Email sent successfully.")
