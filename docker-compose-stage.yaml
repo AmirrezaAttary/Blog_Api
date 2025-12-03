@@ -1,0 +1,91 @@
+version: "3.9"
+services:
+  db:
+    container_name: db
+    image: postgres:15-alpine
+    volumes:
+      - ./postgres/data:/var/lib/postgresql/data
+      - ./pg_hba.conf:/docker-entrypoint-initdb.d/pg_hba.conf:ro
+      - ./init-hba.sh:/docker-entrypoint-initdb.d/init-hba.sh:ro
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    ports:
+      - 5432:5432
+    restart: always
+    
+  redis:
+    container_name: redis
+    image: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --save 60 1 --loglevel warning
+
+  backend:
+    build: .
+    container_name: backend
+    command: sh -c "python manage.py migrate --noinput && python manage.py collectstatic --noinput && gunicorn core.wsgi --bind 0.0.0.0:8000"
+    volumes:
+      - ./core:/app
+
+      - static_volume:/app/static
+
+      - media_volume:/app/media
+    expose:
+      - "8000"
+    environment:
+      - SECRET_KEY=django-insecure--dm)rh6=$uqyt8hej!$=nt(-$f%tt339*k4&bl432d)0^7oknh
+      - DEBUG=False
+    depends_on:
+      - redis
+      - db
+    restart: always
+
+  worker:
+    build: .
+    command: celery -A core worker --loglevel=info
+    volumes:
+      - ./core:/app
+    depends_on:
+      - redis
+      - backend
+      - db
+
+  worker-beat:
+    build: .
+    command: celery -A core beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    volumes:
+      - ./core:/app
+    depends_on:
+      - redis
+      - backend
+      - worker
+    restart: always
+
+
+  nginx:
+
+    image: nginx
+    container_name: nginx
+    restart: always
+    ports: 
+      - "80:80"
+    depends_on:
+      - backend
+      - redis
+
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+
+      - static_volume:/home/app/static
+
+      - media_volume:/home/app/media
+
+volumes:
+
+  static_volume:
+
+  media_volume:
