@@ -1,18 +1,41 @@
-name: Docker Image CI
+name: Django Tests with Docker Compose
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
-
-  build:
-
+  test:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build containers
+      run: |
+        docker compose build
+
+    - name: Start DB and Redis
+      run: |
+        docker compose up -d db redis
+        echo "⏳ Waiting for Postgres..."
+        until docker exec db pg_isready -U postgres; do sleep 1; done
+        echo "Postgres Ready!"
+
+    - name: Run migrations
+      run: |
+        docker compose run --rm backend sh -c "python manage.py migrate --noinput"
+
+    - name: Run tests
+      run: |
+        docker compose run --rm backend pytest -vv
+
+    - name: Stop Docker Compose
+      if: always()
+      run: docker compose down
