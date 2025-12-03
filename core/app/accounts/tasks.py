@@ -1,11 +1,17 @@
 from celery import shared_task
-from time import sleep
+from .models import User
 import logging
 
 logger = logging.getLogger(__name__)
 
 @shared_task
-def sendEmail():
-    sleep(3)
-    print('done sending email')
+def delete_unverified_users():
+    """
+    Delete all users who are not verified.
+    """
+    unverified_users = User.objects.filter(is_verified=False)
+    count = unverified_users.count()
+    unverified_users.delete()
     
+    logger.info(f"Deleted {count} unverified users.")
+    return f"Deleted {count} unverified users."
