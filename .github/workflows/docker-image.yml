@@ -14,7 +14,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Debug workspace (نمایش درخت فایل‌ها)
+    - name: Debug workspace
       run: |
         echo "Current folder:"
         pwd
