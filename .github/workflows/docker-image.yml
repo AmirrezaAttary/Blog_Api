@@ -18,10 +18,12 @@ jobs:
       run: |
         echo "Current folder:"
         pwd
-        echo "List content:"
+        echo "List content of workflow folder:"
         ls -R .
+        echo "List content two folders up:"
+        ls -R ../../
 
-    - name: Build containers
+    - name: Build Docker containers
       run: |
         docker compose -f ../../Docker-compose.yml build
 
@@ -30,6 +32,7 @@ jobs:
         docker compose -f ../../Docker-compose.yml up -d db redis
         echo "⏳ Waiting for Postgres..."
         until docker exec db pg_isready -U postgres; do sleep 1; done
+        echo "Postgres Ready!"
 
     - name: Run migrations
       run: |
