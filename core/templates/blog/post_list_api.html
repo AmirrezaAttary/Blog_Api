@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لیست پست‌ها</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <style>
+    body { background: linear-gradient(135deg, #eef2ff, #f8fafc); }
+  </style>
+</head>
+<body class="min-h-screen p-6 flex justify-center font-sans">
+
+  <div class="w-full max-w-4xl">
+
+    <!-- Header -->
+    <div class="text-center mb-10">
+      <h1 class="text-4xl font-extrabold text-indigo-700 mb-3 tracking-tight">آخرین مقالات</h1>
+      <p class="text-gray-600 text-lg">مطالب آموزشی، بررسی تخصصی و معرفی محصولات جدید</p>
+    </div>
+
+    <!-- Posts wrapper -->
+    <div id="post-wrapper" class="grid grid-cols-1 sm:grid-cols-2 gap-6"></div>
+
+    <!-- Loader -->
+    <div id="loader" class="text-center text-gray-600 mt-6 hidden">در حال بارگذاری...</div>
+  </div>
+
+  <script>
+    $(function () {
+      const wrapper = $('#post-wrapper');
+      const loader = $('#loader');
+      loader.removeClass('hidden');
+
+      $.get('/blog/api/v1/post/', function (data) {
+        loader.addClass('hidden');
+
+        for (post of data.results) {
+          wrapper.append(`
+            <div class="bg-white rounded-2xl shadow-md hover:shadow-xl transition overflow-hidden hover:-translate-y-1">
+              <div class="p-5 flex flex-col h-full">
+                <h2 class="text-xl font-bold text-gray-800 mb-2">${post.title}</h2>
+                <p class="text-gray-600 text-sm flex-1">${post.summary || "خلاصه‌ای برای این پست ثبت نشده است."}</p>
+
+                <div class="mt-4 text-xs text-gray-500">${post.created_date || ''}</div>
+
+                <a href="/blog/post/${post.id}/" class="mt-4 inline-block bg-indigo-600 text-white px-4 py-2 rounded-xl text-center hover:bg-indigo-700 transition">
+                  مشاهده پست
+                </a>
+              </div>
+            </div>
+          `);
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ object.title }}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background: #f3f4f6; }
+  </style>
+</head>
+<body class="min-h-screen p-6 flex justify-center">
+
+  <div class="w-full max-w-3xl">
+
+    <!-- Post card -->
+    <article class="bg-white shadow-lg rounded-2xl p-6 mb-8">
+      <h1 class="text-3xl font-bold text-gray-800 mb-3">{{ object.title }}</h1>
+
+      <div class="text-sm text-gray-500 mb-4 flex gap-4">
+        <span>تاریخ انتشار: {{ object.published_date|date:"Y/m/d" }}</span>
+        <span>امروز: {{ now|date:"Y/m/d" }}</span>
+      </div>
+
+      <div class="prose prose-lg prose-indigo max-w-none leading-8 text-gray-800">
+        {{ object.content|safe }}
+      </div>
+    </article>
+
+
+    <!-- Comments section -->
+    <section class="bg-white p-6 rounded-2xl shadow">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-4">نظرات کاربران</h2>
+
+      {% if object.post_comment.all %}
+        <ul class="space-y-4">
+          {% for c in object.post_comment.all %}
+            <li class="p-4 bg-gray-50 rounded-xl border">
+              <p class="text-gray-700"><strong>کاربر:</strong> {{ c.user }}</p>
+              <p class="mt-1 text-gray-800">{{ c.text }}</p>
+              <span class="block mt-2 text-xs text-gray-500">{{ c.created_at|date:"Y/m/d H:i" }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-gray-600">هنوز نظری ثبت نشده است.</p>
+      {% endif %}
+    </section>
+
+  </div>
+
+</body>
+</html>

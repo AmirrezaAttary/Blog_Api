@@ -61,6 +61,7 @@ class PostListApiView(TemplateView):
 
 class PostDetailView(LoginRequiredMixin, DetailView):
     model = Post
+    template_name = "blog/post_detail.html"
 
 
 class PostCreateView(LoginRequiredMixin, CreateView):
